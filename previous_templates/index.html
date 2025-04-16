@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="row">
+  <h1>All Students</h1>
+  <div class="container">
+    <div class="row">
+      {% for student in students %}
+      <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+        <div class="card mb-4 custom-border">
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ student.name }}</h5>
+            <p class="card-text"><strong>Age:</strong> {{ student.age }}</p>
+            <p class="card-text"><strong>Major:</strong> {{ student.major }}</p>
+          </div>
+          <div class="card-footer">
+            <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn btn-primary text-center">Edit</a>
+            <form action="{{ url_for('delete_student', student_id=student.id) }}" method="post" style="display:inline;">
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <br>
+  <br>
+  <a href="{{ url_for('add_student') }}" class="btn btn-success">Add Student</a>
+</main>
+
+{% endblock %}

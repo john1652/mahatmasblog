@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Account Settings{% endblock %}
+{% block content %}
+  <h2>Account Settings</h2>
+  <p>Username: {{ username }}</p>
+  <form method="post">
+      <input type="password" name="new_password" placeholder="New password" required>
+      <button type="submit">Update Password</button>
+  </form>
+{% endblock %}

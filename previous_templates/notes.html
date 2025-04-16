@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}My Notes{% endblock %}
+{% block content %}
+  <h2>Your Notes</h2>
+  <form method="post">
+      <textarea name="content" placeholder="Write a note..." required></textarea>
+      <button type="submit">Add Note</button>
+  </form>
+  <ul>
+    {% for note, timestamp in notes %}
+      <li><strong>{{ timestamp }}:</strong> {{ note }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

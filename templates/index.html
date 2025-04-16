@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Welcome to the Blog!</h1>
+    <p>This is the front page for my blog! Hope you enjoy and learn something!</p>
+
+    <div class="blog-cards">
+        {% for post in blog_posts %}
+        <div class="blog-card">
+            <!-- <img src="{{ post['image_url'] if post['image_url'] else 'https://via.placeholder.com/400x200' }}" alt="Blog Image">
+        -->
+        <a href="{{ url_for('blog_post', post_id=post['post_id']) }}" class="blog-card">
+            <div class="content">
+                <h3>{{ post['title'] }}</h3>
+                <p>{{ post['body'][:100] }}...</p>
+                <div class="meta">
+                    <span>{{ post['date'] }}</span>
+                    <span>{{ post['blog_category'] }}</span>
+                </div>
+            </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

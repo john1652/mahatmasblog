@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="row">
+    <h1>Edit Student</h1>
+    <form method="POST" class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="{{ student.name }}" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" value="{{ student.age }}" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="major">Major:</label>
+        <select id="major" name="major" class="form-control" required>
+          <option value="Finance" >Finance</option>
+          <option value="Accounting" >Accounting</option>
+          <option value="Information Systems" >Information Systems</option>
+          <option value="Marketing" >Marketing</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-success">Save Changes</button>
+    </form>
+  </main>
+</div>
+{% endblock %}

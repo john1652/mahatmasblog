@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Welcome to the Database!</h1>
+    <p>This is a test page to query information from db</p>
+    <ul>
+        {% if blog_posts %}
+            <li><strong>{{ blog_posts[0]['blog_category'] }}<strong>{{ blog_posts[0]['title'] }}</strong>: {{ blog_posts[0]['body'] }}</li>
+        {% else %}
+            <li> </li>
+            <li>No blog posts available.</li>
+        {% endif %}
+    </ul>
+</div>
+{% endblock %}
+

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Delete Blog Posts</h1>
+    <p>Select a blog post to delete:</p>
+    <ul class="list-group">
+        {% for post in blog_posts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ post['title'] }}</strong> - <em>{{ post['blog_category'] }}</em>
+                <p>{{ post['date'] }}</p>
+            </div>
+            <form method="POST" action="{{ url_for('delete_blog_post', post_id=post['post_id']) }}">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
