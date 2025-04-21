@@ -2,7 +2,7 @@
 {% block content %}
   <main class="row">
     <h1>Add Blog Post</h1>
-    <form method="POST" action="{{ url_for('add_blog_post') }}" class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
+    <form method="POST" action="{{ url_for('add_blog_post') }}" enctype="multipart/form-data" class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
       <!-- Hidden input for user_id -->
       <input type="hidden" name="user_id" value="{{ user_id }}">
 

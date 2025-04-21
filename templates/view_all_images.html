@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}View All Images{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Uploaded Images</h1>
+    {% if images %}
+        <div class="row">
+            {% for image in images %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ url_for('static', filename='images/' + image) }}" class="card-img-top" alt="{{ image }}">
+                    <div class="card-body">
+                        <p class="card-text text-center">{{ image }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No images uploaded yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -5,10 +5,10 @@ cursor = conn.cursor()
 
 # Users Table
 
-cursor.execute('DROP TABLE IF EXISTS users')
-cursor.execute('DROP TABLE IF EXISTS blog_posts')
-cursor.execute('DROP TABLE IF EXISTS comments')
-cursor.execute('DROP TABLE IF EXISTS attachments')
+# cursor.execute('DROP TABLE IF EXISTS users')
+# cursor.execute('DROP TABLE IF EXISTS blog_posts')
+# cursor.execute('DROP TABLE IF EXISTS comments')
+# cursor.execute('DROP TABLE IF EXISTS attachments')
 
 
 
@@ -32,8 +32,11 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS blog_posts (
                     blog_type TEXT,
                     likes INTEGER DEFAULT 0, -- New column for likes
                     dislikes INTEGER DEFAULT 0, -- New column for dislikes
+                    image_path TEXT, -- Path to the uploaded image
                     FOREIGN KEY (user_id) REFERENCES users(user_id)
                 )''')
+
+
 
 # Comments Table
 cursor.execute('''CREATE TABLE IF NOT EXISTS comments (

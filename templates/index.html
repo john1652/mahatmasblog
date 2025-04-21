@@ -3,7 +3,9 @@
 <div class="container">
     <h1>Welcome to the Blog!</h1>
     <p>This is the front page for my blog! Hope you enjoy and learn something!</p>
+    <img src="{{ url_for('static', filename='images/hardtruth.jpg') }}" class="img-fluid mb-3" alt="Index Image">
 
+    <h2>Latest Blog Posts</h2>
     <div class="blog-cards">
         {% for post in blog_posts %}
         <div class="blog-card">

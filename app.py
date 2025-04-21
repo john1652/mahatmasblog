@@ -13,6 +13,9 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @app.route("/")
 def home():
     conn = get_db_connection()
@@ -42,13 +45,6 @@ def blog_posts_page():
 
     conn.close()
     return render_template('blog_posts.html', blog_posts=blog_posts, categories=categories, selected_category=selected_category)
-
-@app.route('/temp_blog_post')
-def temp_blog_post():
-    conn = get_db_connection()
-    blog_posts = conn.execute("SELECT * FROM blog_posts").fetchall()
-    conn.close()
-    return render_template('temp_blog_post.html', blog_posts=blog_posts)
 
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
@@ -88,6 +84,9 @@ def add_blog_post():
         body = request.form['body']
         blog_type = request.form['blog_type']
 
+        
+
+        # Insert blog post into the database
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
@@ -113,29 +112,42 @@ def user_list():
 
 @app.route('/blog_post/<int:post_id>', methods=['GET', 'POST'])
 def blog_post(post_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        flash('Please log in to comment.', 'error')
+        return redirect(url_for('login'))
+
     conn = get_db_connection()
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Fetch the blog post
+    cursor.execute("SELECT * FROM blog_posts WHERE post_id = ?", (post_id,))
+    post = cursor.fetchone()
+
+    # Fetch comments for the blog post
+    cursor.execute("""
+        SELECT c.body, u.username
+        FROM comments c
+        JOIN users u ON c.user_id = u.user_id
+        WHERE c.post_id = ?
+    """, (post_id,))
+    comments = cursor.fetchall()
+
+    # Fetch the logged-in user's username
+    cursor.execute("SELECT username FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+    username = user['username']
+
     if request.method == 'POST':
-        user_id = request.form['user_id']
-        comment_body = request.form['body']
-        conn.execute(
-            "INSERT INTO comments (user_id, post_id, body) VALUES (?, ?, ?)",
-            (user_id, post_id, comment_body)
-        )
+        body = request.form['body']
+        cursor.execute("INSERT INTO comments (user_id, post_id, body) VALUES (?, ?, ?)", (user_id, post_id, body))
         conn.commit()
         flash('Comment added successfully!', 'success')
-    
-    post = conn.execute("SELECT * FROM blog_posts WHERE post_id = ?", (post_id,)).fetchone()
-    comments = conn.execute(
-        "SELECT c.body, u.username FROM comments c JOIN users u ON c.user_id = u.user_id WHERE c.post_id = ?",
-        (post_id,)
-    ).fetchall()
-    conn.close()
+        return redirect(url_for('blog_post', post_id=post_id))
 
-    if post:
-        return render_template('blog_post.html', post=post, comments=comments)
-    else:
-        flash('Blog post not found!', 'danger')
-        return redirect(url_for('blog_posts_page'))
+    conn.close()
+    return render_template('blog_post.html', post=post, comments=comments, username=username)
 
 @app.route('/delete_blog_posts')
 def delete_blog_posts_page():
@@ -240,29 +252,32 @@ def register():
     return redirect(url_for('profile'))
 
 
-@app.route('/')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
+        # Check if the username and password are provided
         if not username or not password:
-            flash('Username and password are required', 'error')
+            flash('Username and password are required.', 'error')
             return redirect(url_for('login'))
 
-        conn = sqlite3.connect('database.db')
+        # Query the database for the user
+        conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE username=?", (username,))
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
         user = cursor.fetchone()
         conn.close()
 
-        if user is None or user[2] != password:
-            flash('Invalid username or password', 'error')
-        else:
-            session['user_id'] = user[0]
-            flash('Login successful', 'success')
+        # Validate the user
+        if user and user['password'] == password:  # Replace with hashed password check in production
+            session['user_id'] = user['user_id']  # Log the user in by storing their ID in the session
+            flash('Login successful!', 'success')
             return redirect(url_for('profile'))
+        else:
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
@@ -292,6 +307,24 @@ def logout():
     flash('Logged out successfully', 'success')
     return redirect(url_for('index'))
 
+@app.route('/user_info', methods=['GET', 'POST'])
+def user_info():
+    conn = get_db_connection()
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, username, password, email FROM users")
+    users = cursor.fetchall()
+    conn.close()
+    return render_template('user_info.html', users=users)
+
+@app.route('/view_all_images')
+def view_all_images():
+    # Get the list of all files in the static/images directory
+    image_folder = app.config['UPLOAD_FOLDER']
+    images = []
+    if os.path.exists(image_folder):
+        images = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+    return render_template('view_all_images.html', images=images)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,60 +1,76 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
-    <h1>{{ post['title'] }}</h1>
-    <p><strong>Category:</strong> {{ post['blog_category'] }}</p>
-    <p><strong>Date:</strong> {{ post['date'] }}</p>
-    <p><strong>Body:</strong></p>
-    <p>{{ post['body'] }}</p>
-    <a href="{{ url_for('blog_posts_page') }}">Back to Blog Posts</a>
+<div class="container mt-4">
+    <!-- Blog Post Header -->
+    <div class="mb-4">
+        <h1 class="display-4">{{ post['title'] }}</h1>
+        <p class="text-muted">
+            <strong>Category:</strong> {{ post['blog_category'] }} |
+            <strong>Date:</strong> {{ post['date'] }}
+        </p>
+    </div>
 
-    <hr>
+    <!-- Blog Post Body -->
+    <div class="mb-5">
+        {% if post['title'] == "Grenada Sunsets" %}
+            <img src="{{ url_for('static', filename='images/sunset.jpg') }}" class="img-fluid dynamic-image mb-3" alt="Example Image">
+        {% elif post['title'] == "Trail Race Progression" %}
+            <img src="{{ url_for('static', filename='images/running.jpg') }}" class="img-fluid dynamic-image mb-3" alt="Example Image">
+        {% elif post['title'] == "Flag Football Final" %}
+            <img src="{{ url_for('static', filename='images/football.jpg') }}" class="img-fluid dynamic-image mb-3" alt="Football">
+            {% elif post['title'] == "Top 10 Hidden Gems of Indiana!" %}
+            <img src="{{ url_for('static', filename='images/gary.jpg') }}" class="img-fluid dynamic-image mb-3" alt="Gary">
+        {% endif %}
+        <p class="lead">{{ post['body'] }}</p>
+        <a href="{{ url_for('blog_posts_page') }}" class="btn btn-secondary mt-3">Back to Blog Posts</a>
+    </div>
+
+    <hr class="my-4">
 
     <!-- Like/Dislike Buttons -->
-    <div class="d-flex align-items-center">
-        <form method="POST" action="{{ url_for('like_post', post_id=post['post_id']) }}" style="margin-right: 10px;">
-            <button type="submit" class="btn btn-success">👍 Like ({{ post['likes'] }})</button>
+    <div class="d-flex justify-content-center align-items-center mb-4">
+        <form method="POST" action="{{ url_for('like_post', post_id=post['post_id']) }}" class="me-3">
+            <button type="submit" class="btn btn-success btn-lg">👍 Like ({{ post['likes'] }})</button>
         </form>
         <form method="POST" action="{{ url_for('dislike_post', post_id=post['post_id']) }}">
-            <button type="submit" class="btn btn-danger">👎 Dislike ({{ post['dislikes'] }})</button>
+            <button type="submit" class="btn btn-danger btn-lg">👎 Dislike ({{ post['dislikes'] }})</button>
         </form>
     </div>
 
-    <hr>
+    <hr class="my-4">
 
-    <!-- Display Comments -->
-    <h2>Comments</h2>
-    {% if comments %}
-        <ul class="list-group">
-            {% for comment in comments %}
-            <li class="list-group-item">
-                <strong>{{ comment['username'] }}</strong>: {{ comment['body'] }}
-            </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No comments yet. Be the first to comment!</p>
-    {% endif %}
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h2 class="mb-4">Comments</h2>
+        {% if comments %}
+            <ul class="list-group mb-4">
+                {% for comment in comments %}
+                <li class="list-group-item">
+                    <strong>{{ comment['username'] }}</strong>: {{ comment['body'] }}
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">No comments yet. Be the first to comment!</p>
+        {% endif %}
+    </div>
 
-    <hr>
+    <hr class="my-4">
 
     <!-- Comment Form -->
-    <h2>Leave a Comment</h2>
-    <form method="POST" action="{{ url_for('blog_post', post_id=post['post_id']) }}">
-        <div class="form-group">
-            <label for="user_id">Select User:</label>
-            <select name="user_id" id="user_id" class="form-control" required>
-                <option value="">Select a User</option>
-                {% for user in users %}
-                <option value="{{ user['user_id'] }}">{{ user['username'] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="body">Comment:</label>
-            <textarea name="body" id="body" class="form-control" rows="3" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Comment</button>
-    </form>
+    <div class="comment-form">
+        <h2 class="mb-4">Leave a Comment</h2>
+        <form method="POST" action="{{ url_for('blog_post', post_id=post['post_id']) }}">
+            <div class="form-group">
+                <label for="username">Logged-in User:</label>
+                <input type="text" name="username" id="username" class="form-control" value="{{ username }}" readonly>
+            </div>
+            <div class="form-group mt-3">
+                <label for="body">Comment:</label>
+                <textarea name="body" id="body" class="form-control" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Add Comment</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

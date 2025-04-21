@@ -1,11 +1,13 @@
 /* Global Styles */
 :root {
-    --primary: #ff6a3e;
-    --primaryLight: #ffba43;
-    --secondary: #ffba43;
-    --headerColor: #1a1a1a;
-    --bodyTextColor: #4e4b66;
-    --bodyFontSize: 1rem;
+    --primary: #ff914d; /* Light orange for highlights */
+    --primaryLight: #ffc299; /* Softer orange for hover effects */
+    --secondary: #453c37; /* Dark brown for accents */
+    --headerColor: #1a1a1a; /* Black for headers */
+    --bodyTextColor: #333333; /* Dark grey for body text */
+    --backgroundColor: #f7f3f0; /* Light beige for background */
+    --contentBackground: #ffffff; /* White for content area */
+    --borderColor: #d9d2c7; /* Soft grey-brown for borders */
     --sectionPadding: clamp(3.75rem, 7.82vw, 6.25rem) 1rem;
 }
 
@@ -14,7 +16,7 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
     color: var(--bodyTextColor);
-    background-color: #f7f7f7;
+    background-color: var(--backgroundColor);
 }
 
 h1, h2, h3 {
@@ -30,81 +32,143 @@ a:hover {
     color: var(--primaryLight);
 }
 
-/* Blog Section */
-#blog-section {
-    padding: var(--sectionPadding);
-    background-color: #fff;
+/* Navbar Styling */
+.navbar {
+    background-color: var(--secondary);
+    border-color: var(--borderColor);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand, .navbar-nav > li > a {
+    color: white !important;
+}
+
+.navbar-brand:hover, .navbar-nav > li > a:hover {
+    color: var(--primaryLight) !important;
+}
+
+/* Footer Styling */
+footer {
+    background-color: var(--secondary);
+    color: white;
+    padding: 1rem;
     text-align: center;
 }
 
-#blog-section .container {
-    max-width: 1200px;
-    margin: auto;
+footer p {
+    margin: 0;
 }
 
-#blog-section .blog-header {
-    margin-bottom: 2rem;
+/* Blog Section */
+#blog-section {
+    padding: var(--sectionPadding);
+    background-color: var(--contentBackground);
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 1200px;
 }
 
 #blog-section .blog-header h2 {
     font-size: clamp(1.9375rem, 3.9vw, 3.0625rem);
     font-weight: 900;
     margin: 0;
+    color: var(--headerColor);
 }
 
 #blog-section .blog-header p {
-    font-size: var(--bodyFontSize);
+    font-size: 1rem;
     margin: 0;
     color: var(--bodyTextColor);
 }
 
-#blog-section .blog-cards {
+/* Blog Cards */
+.blog-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
 }
 
-#blog-section .blog-card {
-    background-color: #fff;
+.blog-card {
+    background-color: var(--contentBackground);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--borderColor);
 }
 
-#blog-section .blog-card:hover {
+.blog-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
-#blog-section .blog-card img {
+.blog-card img {
     width: 100%;
     height: 200px;
     object-fit: cover;
 }
 
-#blog-section .blog-card .content {
+.blog-card .content {
     padding: 1rem;
     text-align: left;
 }
 
-#blog-section .blog-card .content h3 {
+.blog-card .content h3 {
     font-size: 1.25rem;
     margin: 0 0 0.5rem;
     color: var(--headerColor);
 }
 
-#blog-section .blog-card .content p {
+.blog-card .content p {
     font-size: 0.875rem;
     margin: 0;
     color: var(--bodyTextColor);
 }
 
-#blog-section .blog-card .content .meta {
+.blog-card .content .meta {
     margin-top: 1rem;
     font-size: 0.875rem;
-    color: #999;
+    color: var(--bodyTextColor);
     display: flex;
     justify-content: space-between;
+}
+
+/* Comments Section */
+.comments-section {
+    background-color: var(--contentBackground);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--borderColor);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.comment-form {
+    background-color: var(--contentBackground);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--borderColor);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.list-group-item {
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: var(--contentBackground);
+    border: 1px solid var(--borderColor);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primaryLight);
+    border-color: var(--primaryLight);
+    color: white;
 }
