@@ -4,10 +4,15 @@ import os
 from werkzeug.utils import secure_filename
 from forms import RegistrationForm, LoginForm, BlogPostForm, EditBlogPostForm
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/images'
-app.secret_key = 'your_secret_key'  # Change this to a secure random key
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', 'static/images')
+app.secret_key = os.getenv('SECRET_KEY', 'default-secret-key-replace-in-production')
+app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))  # 16MB max file upload
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def get_db_connection():
