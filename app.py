@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
+from forms import RegistrationForm, LoginForm, BlogPostForm, EditBlogPostForm
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'static/images'
@@ -77,14 +79,13 @@ def add_blog_post():
         flash('Please log in to add a blog post.', 'error')
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        blog_category = request.form['blog_category']
-        title = request.form['title']
-        date = request.form['date']
-        body = request.form['body']
-        blog_type = request.form['blog_type']
-
-        
+    form = BlogPostForm()
+    if form.validate_on_submit():
+        blog_category = form.blog_category.data
+        title = form.title.data
+        date = form.date.data
+        body = form.body.data
+        blog_type = form.blog_type.data
 
         # Insert blog post into the database
         conn = get_db_connection()
@@ -99,7 +100,7 @@ def add_blog_post():
         flash('Blog post added successfully!', 'success')
         return redirect(url_for('blog_posts_page'))
 
-    return render_template('add_blog_post.html', user_id=user_id)
+    return render_template('add_blog_post.html', form=form, user_id=user_id)
 
 @app.route('/user_list')
 def user_list():
@@ -180,26 +181,49 @@ def edit_blog_post():
 @app.route('/edit_blog_post_instance/<int:post_id>', methods=['GET', 'POST'])
 def edit_blog_post_instance(post_id):
     conn = get_db_connection()
-    if request.method == 'POST':
-        user_id = request.form['user_id']
-        blog_category = request.form['blog_category']
-        title = request.form['title']
-        date = request.form['date']
-        body = request.form['body']
-        blog_type = request.form['blog_type']
-        conn.execute(
-            "UPDATE blog_posts SET user_id = ?, blog_category = ?, title = ?, date = ?, body = ?, blog_type = ? WHERE post_id = ?",
-            (user_id, blog_category, title, date, body, blog_type, post_id)
-        )
-        conn.commit()
-        conn.close()
-        flash('Blog post updated successfully!', 'success')
-        return redirect(url_for('edit_blog_post'))
-    else:
+    
+    # Get all users for the dropdown
+    users = conn.execute("SELECT user_id, username FROM users").fetchall()
+    
+    # Create form and set user choices
+    form = EditBlogPostForm()
+    form.user_id.choices = [(user['user_id'], user['username']) for user in users]
+    
+    if request.method == 'GET':
+        # Get the current post data
         post = conn.execute("SELECT * FROM blog_posts WHERE post_id = ?", (post_id,)).fetchone()
-        users = conn.execute("SELECT user_id, username FROM users").fetchall()
-        conn.close()
-        return render_template('edit_blog_post_instance.html', post=post, users=users)
+        if post:
+            # Populate form with existing data
+            form.user_id.data = post['user_id']
+            form.title.data = post['title']
+            form.blog_category.data = post['blog_category']
+            form.date.data = datetime.strptime(post['date'], '%Y-%m-%d') if post['date'] else None
+            form.body.data = post['body']
+            form.blog_type.data = post['blog_type']
+        else:
+            flash('Blog post not found.', 'error')
+            return redirect(url_for('edit_blog_post'))
+    
+    if form.validate_on_submit():
+        try:
+            conn.execute(
+                """UPDATE blog_posts 
+                   SET user_id = ?, blog_category = ?, title = ?, 
+                       date = ?, body = ?, blog_type = ? 
+                   WHERE post_id = ?""",
+                (form.user_id.data, form.blog_category.data, form.title.data,
+                 form.date.data.strftime('%Y-%m-%d'), form.body.data, 
+                 form.blog_type.data, post_id)
+            )
+            conn.commit()
+            flash('Blog post updated successfully!', 'success')
+            return redirect(url_for('edit_blog_post'))
+        except Exception as e:
+            flash(f'Error updating blog post: {str(e)}', 'error')
+    
+    post = conn.execute("SELECT * FROM blog_posts WHERE post_id = ?", (post_id,)).fetchone()
+    conn.close()
+    return render_template('edit_blog_post_instance.html', form=form, post=post)
 
 @app.route('/like_post/<int:post_id>', methods=['POST'])
 def like_post(post_id):
@@ -220,48 +244,45 @@ def dislike_post(post_id):
     return redirect(url_for('blog_post', post_id=post_id))
 
 # User Registration & Authentification
-@app.route('/register')
-def index():
-    return render_template('register.html')
-
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    username = request.form['username']
-    password = request.form['password']
-    name = request.form['name']
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        name = form.name.data
+        email = form.email.data
 
-    if not username or not password:
-        flash('Username and password are required', 'error')
-        return redirect(url_for('index'))
+        # Check if username already exists
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+        if cursor.fetchone():
+            flash('Username already exists. Please choose another.', 'error')
+            return redirect(url_for('register'))
 
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
+        # Insert the new user into the database
+        cursor.execute("INSERT INTO users (username, password, name, email) VALUES (?, ?, ?, ?)", 
+                      (username, password, name, email))
+        conn.commit()
 
-    # Insert the new user into the database
-    cursor.execute("INSERT INTO users (username, password, name) VALUES (?, ?, ?)", (username, password, name))
-    conn.commit()
+        # Get the ID of the newly created user
+        user_id = cursor.lastrowid
+        conn.close()
 
-    # Get the ID of the newly created user
-    user_id = cursor.lastrowid
-    conn.close()
+        # Log the user in by storing their ID in the session
+        session['user_id'] = user_id
+        flash('Registration successful! Welcome to your profile.', 'success')
+        return redirect(url_for('profile'))
 
-    # Log the user in by storing their ID in the session
-    session['user_id'] = user_id
-
-    flash('Registration successful! Welcome to your profile.', 'success')
-    return redirect(url_for('profile'))
-
+    return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        # Check if the username and password are provided
-        if not username or not password:
-            flash('Username and password are required.', 'error')
-            return redirect(url_for('login'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
 
         # Query the database for the user
         conn = get_db_connection()
@@ -272,14 +293,14 @@ def login():
 
         # Validate the user
         if user and user['password'] == password:  # Replace with hashed password check in production
-            session['user_id'] = user['user_id']  # Log the user in by storing their ID in the session
+            session['user_id'] = user['user_id']
             flash('Login successful!', 'success')
             return redirect(url_for('profile'))
         else:
             flash('Invalid username or password.', 'error')
             return redirect(url_for('login'))
 
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 @app.route('/profile')
 def profile():

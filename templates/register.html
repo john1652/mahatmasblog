@@ -1,11 +1,107 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
+
+{% block title %}Register - Blog{% endblock %}
+
 {% block content %}
-    <h2>Register</h2>
-    <form method="post" action="/register" autocomplete="off">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="text" name="name" placeholder="Name" required>
-        <button type="submit">Register</button>
-    </form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Register</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">Registration Requirements:</h5>
+                        <ul class="mb-0">
+                            <li><strong>Username:</strong> 3-20 characters, letters, numbers, and underscores only</li>
+                            <li><strong>Name:</strong> 2-50 characters</li>
+                            <li><strong>Email:</strong> Must be a valid email address</li>
+                            <li><strong>Password Requirements:</strong>
+                                <ul>
+                                    <li>At least 8 characters long</li>
+                                    <li>At least one uppercase letter</li>
+                                    <li>At least one lowercase letter</li>
+                                    <li>At least one number</li>
+                                    <li>At least one special character (!@#$%^&*(),.?":{}|&lt;&gt;)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('register') }}">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control", placeholder="e.g., john_doe123") }}
+                            {% if form.username.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control", placeholder="e.g., John Doe") }}
+                            {% if form.name.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control", placeholder="e.g., john@example.com") }}
+                            {% if form.email.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Enter a strong password") }}
+                            {% if form.password.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control", placeholder="Re-enter your password") }}
+                            {% if form.confirm_password.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.confirm_password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,44 +1,97 @@
-{% extends 'base.html' %}
-{% block content %}
-  <main class="row">
-    <h1>Add Blog Post</h1>
-    <form method="POST" action="{{ url_for('add_blog_post') }}" enctype="multipart/form-data" class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
-      <!-- Hidden input for user_id -->
-      <input type="hidden" name="user_id" value="{{ user_id }}">
+{% extends "base.html" %}
 
-      <div class="form-group">
-        <label for="blog_category">Category:</label>
-        <select name="blog_category" id="blog_category" class="form-control" required>
-          <option value="">Select Blog Category</option>
-          <option value="Top 10s">Top 10s</option>
-          <option value="John's Journeys">John's Journeys</option>
-          <option value="Moments to Memories">Moments to Memories</option>
-          <option value="Reviews">Reviews</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="title">Title:</label>
-        <input type="text" name="title" id="title" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label for="body">Body:</label>
-        <textarea name="body" id="body" class="form-control" rows="5" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="blog_type">Blog Type:</label>
-        <select name="blog_type" id="blog_type" class="form-control" required>
-          <option value="">Select Blog Type</option>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="private">Private</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-success">Submit</button>
-    </form>
-  </main>
+{% block title %}Add Blog Post - Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Add New Blog Post</h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <h5 class="alert-heading">Blog Post Requirements:</h5>
+                        <ul class="mb-0">
+                            <li><strong>Title:</strong> 5-100 characters</li>
+                            <li><strong>Category:</strong> Must select one of the available categories</li>
+                            <li><strong>Date:</strong> Must be a valid date</li>
+                            <li><strong>Content:</strong> At least 10 characters long</li>
+                            <li><strong>Type:</strong> Must select one of the available types (Published, Draft, or Private)</li>
+                        </ul>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('add_blog_post') }}">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control", placeholder="Enter a descriptive title (5-100 characters)") }}
+                            {% if form.title.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.blog_category.label(class="form-label") }}
+                            {{ form.blog_category(class="form-select") }}
+                            {% if form.blog_category.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.blog_category.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.date.label(class="form-label") }}
+                            {{ form.date(class="form-control", type="date") }}
+                            {% if form.date.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.date.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.body.label(class="form-label") }}
+                            {{ form.body(class="form-control", rows="10", placeholder="Write your blog post content (minimum 10 characters)") }}
+                            {% if form.body.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.body.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.blog_type.label(class="form-label") }}
+                            {{ form.blog_type(class="form-select") }}
+                            {% if form.blog_type.errors %}
+                                <div class="alert alert-danger">
+                                    {% for error in form.blog_type.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Create Post</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

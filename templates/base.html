@@ -3,39 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A modern blog platform for sharing ideas and stories">
     <title>{% block title %}Blog Title{% endblock %}</title>
-    <!-- Bootstrap links -->
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!-- Style Sheets -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
 </head>
 
 <body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <!-- Navbar -->
-    <header>
-        <nav class="navbar navbar-default">
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg" aria-label="Main navigation">
             <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#myMenu" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="{{ url_for('home') }}">Mahatma Johndi's Blog</a>
-                </div>
-                <div class="collapse navbar-collapse" id="myMenu">
-                    <ul class="nav navbar-nav">
-                        <li><a href="{{ url_for('home') }}">Home</a></li>
-                        <li><a href="{{ url_for('login') }}">Login</a></li>
-                        <li><a href="{{ url_for('blog_posts_page') }}">All Blog Posts</a></li>
-                        <li><a href="{{ url_for('add_blog_post') }}">Write New Post</a></li>
-                        <li><a href="{{ url_for('admin_index') }}">Admin Index</a></li>
-                        <li><a href="{{ url_for('register') }}">Register</a></li>
-                        <li><a href="{{ url_for('profile') }}">Profile</a></li>
-                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <a class="navbar-brand" href="{{ url_for('home') }}">
+                    <span class="brand-text">Mahatma Johndi's Blog</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('blog_posts_page') }}">All Posts</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('view_all_images') }}">Gallery</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('add_blog_post') }}">Add Post</a></li>
+                        {% if current_user is defined and current_user.is_authenticated %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('profile') }}">Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -43,15 +57,34 @@
     </header>
 
     <!-- Main Content -->
-    <main id="blog-section">
+    <main id="main-content" class="site-main" role="main">
         <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
             {% block content %}{% endblock %}
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="text-center" style="padding: 1rem; background-color: #f7f7f7; margin-top: 2rem;">
-        <p>&copy; 2025 Mahatma Johndi LLC. All rights reserved.</p>
+    <footer class="site-footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2025 Mahatma Johndi LLC. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
     </footer>
 </body>
 </html>
